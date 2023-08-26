@@ -10,7 +10,19 @@ class RandomChar extends Component{
 
     constructor(props) {
         super(props);
-        this.updateChar();// is bad desition!
+        // this.updateChar(); // is bad desition! is owerflows the memory!! you can use the react huks!
+        // console.log('constructor')
+    }
+
+    // basik huks
+    // componentDidMount() => run once after the rendering
+    // componentDidUpdate() => update component
+    // componentWillUnmount() => if component dead clear all nodes, timouts, etc.. from componentDidMount()
+    // componentDidCatch() => if error
+
+    componentDidMount() {
+        // console.log('mount');
+        this.updateChar();
     }
 
     state = {
@@ -59,8 +71,8 @@ class RandomChar extends Component{
             .catch(this.onError);
     }
 
-
     render() {
+        // console.log('render');
         /* 
         destructuritzation of object char inside state.
         const {char: {name, description, thumbnail, homepage, wiki}, loading} = this.state;
@@ -92,7 +104,7 @@ class RandomChar extends Component{
                         Or choose another one
                     </p>
                     <button className="button button__main">
-                        <div className="inner">try it</div>
+                        <div className="inner" onClick={this.updateChar}>try it</div>
                     </button>
                     <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
                 </div>
@@ -104,10 +116,11 @@ class RandomChar extends Component{
 // create new componet with dinamic block, check it and generate spinner or info
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
+    const style = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg" ? {objectFit: 'contain'} : null
 
     return (
         <div className="randomchar__block">
-            <img src={thumbnail} alt="Random character" className="randomchar__img"/>
+            <img src={thumbnail} alt="Random character" style={style} className="randomchar__img"/>
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>
                 <p className="randomchar__descr">
