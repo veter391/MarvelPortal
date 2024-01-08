@@ -75,7 +75,9 @@
         flex-wrap: wrap;
     }
 }
-.char__info {
-    grid-row: 1 / 2;
-    margin-bottom: 20px;
+@media (max-width: 920px) {
+    .char__info {
+        grid-row: 1 / 2;
+        margin-bottom: 20px;
+    }
 }
