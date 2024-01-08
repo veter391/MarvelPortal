@@ -3,6 +3,7 @@
 .app {
     &__header {
         display: flex;
+        flex-wrap: wrap;
         justify-content: space-between;
     }
     &__title {
@@ -27,5 +28,16 @@
                 }
             }
         }
+    }
+}
+
+@media (max-width: 700px) {
+    .app__title {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    .app__menu ul {
+        font-size: 18px;
+        line-height: 24px;
     }
 }

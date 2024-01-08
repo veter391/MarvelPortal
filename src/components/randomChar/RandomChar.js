@@ -56,6 +56,9 @@ class RandomChar extends Component{
         // generate random id for a char
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 
+        // loading true
+        this.setState({loading : true});
+
         // get character info and change the state
         this.marvelService
             .getCharacter(id)
@@ -116,16 +119,16 @@ class RandomChar extends Component{
 // create new componet with dinamic block, check it and generate spinner or info
 const View = ({char}) => {
     const {name, description, thumbnail, homepage, wiki} = char;
-    const style = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg" ? {objectFit: 'contain'} : null
+    const imgStyle = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg" ? {objectFit: 'contain'} : null
 
     return (
         <div className="randomchar__block">
-            <img src={thumbnail} alt="Random character" style={style} className="randomchar__img"/>
+            <img src={thumbnail} alt="Random character" style={imgStyle} className="randomchar__img"/>
             <div className="randomchar__info">
                 <p className="randomchar__name">{name}</p>
                 <p className="randomchar__descr">
                     {/* check if exist descr and if not add custom text */}
-                    {description ? description : 'Not info about this character !'}
+                    {description}
                 </p>
                 <div className="randomchar__btns">
                     <a href={homepage} className="button button__main">

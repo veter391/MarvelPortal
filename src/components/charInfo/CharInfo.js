@@ -1,60 +1,129 @@
+import { Component } from 'react';
+import MarvelService from '../../services/MarvelService';
+import Spinner from '../spinner/Spinner';
+import ErrorMessage from '../errorMessage/ErrorMessage';
+import Skeleton from '../skeleton/Skeleton';
 import './charInfo.scss';
-import thor from '../../resources/img/thor.jpeg';
 
-const CharInfo = () => {
+class CharInfo extends Component {
+
+    
+    state = {
+        // create object char because state can be other info, errors, spinner etc...
+        // create object char with info about character
+        char: null,
+        loading: false,
+        error: false
+    }
+
+    marvelService = new MarvelService(); // add service to variable and create instance of it
+
+    componentDidMount() {
+        this.updateChar();
+    }
+
+    componentDidUpdate(prevProps, prevStates) {
+        if(this.props.charId !== prevProps.charId) {
+            this.updateChar();
+        }
+    }
+
+    updateChar = () => {
+        const {charId} = this.props;
+        if(!charId) {
+            return;
+        }
+
+
+        // show the spinner
+        this.setState({loading : true});
+
+        this.marvelService
+            .getCharacter(charId)
+            .then(this.onCharLoaded)
+            .catch(this.onError);
+    }
+
+    
+    // change info when is loaded
+    onCharLoaded = char => this.setState({
+        // change state.char and add new obj
+        char, 
+        // change loading state when char is loaded
+        loading: false
+    });
+
+    onError = () => {
+        this.setState({
+            // change loading state when char is loaded
+            loading: false,
+            error: true
+        })
+    }
+
+    render() {
+
+        // get ellements from state
+        const {char, loading, error} = this.state,
+
+            skeleton = char || loading || error ? null : <Skeleton/>,
+        // if exist error return error
+            errorMessage = error ? <ErrorMessage/> : null,
+        // if wait info from server return spinner
+            spinner = loading ? <Spinner/> : null,
+        // if doesn't exist error and spinner is null return content
+            content = !(loading || error || !char) ? <View char={char}/> : null
+
+        return (
+            <div className="char__info">
+                {skeleton}
+                {errorMessage}
+                {spinner}
+                {content}
+            </div>
+        )
+    }
+}
+
+// add other components, breake the html and divide to differens components
+const View = ({char}) => {
+    const {name, description, thumbnail, homepage, wiki, comics} = char;
+    let imgStyle = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg" ? {objectFit: 'contain'} : null
     return (
-        <div className="char__info">
-            <div className="char__basics">
-                <img src={thor} alt="abyss"/>
-                <div>
-                    <div className="char__info-name">thor</div>
-                    <div className="char__btns">
-                        <a href="#" className="button button__main">
-                            <div className="inner">homepage</div>
-                        </a>
-                        <a href="#" className="button button__secondary">
-                            <div className="inner">Wiki</div>
-                        </a>
-                    </div>
+        // <></> react fragment. if parent block unexists
+        <>
+        <div className="char__basics">
+            <img src={thumbnail} style={imgStyle} alt="abyss"/>
+            <div>
+                <div className="char__info-name">{name}</div>
+                <div className="char__btns">
+                    <a href={homepage} className="button button__main">
+                        <div className="inner">homepage</div>
+                    </a>
+                    <a href={wiki} className="button button__secondary">
+                        <div className="inner">Wiki</div>
+                    </a>
+                </div>
                 </div>
             </div>
             <div className="char__descr">
-                In Norse mythology, Loki is a god or jötunn (or both). Loki is the son of Fárbauti and Laufey, and the brother of Helblindi and Býleistr. By the jötunn Angrboða, Loki is the father of Hel, the wolf Fenrir, and the world serpent Jörmungandr. By Sigyn, Loki is the father of Nari and/or Narfi and with the stallion Svaðilfari as the father, Loki gave birth—in the form of a mare—to the eight-legged horse Sleipnir. In addition, Loki is referred to as the father of Váli in the Prose Edda.
+                {description}
             </div>
             <div className="char__comics">Comics:</div>
             <ul className="char__comics-list">
-                <li className="char__comics-item">
-                    All-Winners Squad: Band of Heroes (2011) #3
-                </li>
-                <li className="char__comics-item">
-                    Alpha Flight (1983) #50
-                </li>
-                <li className="char__comics-item">
-                    Amazing Spider-Man (1999) #503
-                </li>
-                <li className="char__comics-item">
-                    Amazing Spider-Man (1999) #504
-                </li>
-                <li className="char__comics-item">
-                    AMAZING SPIDER-MAN VOL. 7: BOOK OF EZEKIEL TPB (Trade Paperback)
-                </li>
-                <li className="char__comics-item">
-                    Amazing-Spider-Man: Worldwide Vol. 8 (Trade Paperback)
-                </li>
-                <li className="char__comics-item">
-                    Asgardians Of The Galaxy Vol. 2: War Of The Realms (Trade Paperback)
-                </li>
-                <li className="char__comics-item">
-                    Vengeance (2011) #4
-                </li>
-                <li className="char__comics-item">
-                    Avengers (1963) #1
-                </li>
-                <li className="char__comics-item">
-                    Avengers (1996) #1
-                </li>
+
+                {
+                    comics.map((item, i) => {
+                        return (
+                            <li key={i} className="char__comics-item">
+                                {item.name}
+                            </li>
+                        )
+                    })
+                }
+
             </ul>
-        </div>
+        </>
     )
 }
 

@@ -37,11 +37,13 @@ class MarvelService {
     _transformCharacter = (char) => {
         // transform and return new object and add this to state(obj)
         return {
+            id: char.id,
             name: char.name,
-            description: char.description,
+            description: char.description ? char.description : 'Not info about this character !',
             thumbnail: char.thumbnail.path + '.' + char.thumbnail.extension,
             homepage: char.urls[0].url,
-            wiki: char.urls[1].url
+            wiki: char.urls[1].url,
+            comics: char.comics.items.length === 0 ? [{name: 'Not comics about this character !'}] : char.comics.items.slice(0, 10)
         }
     }
 

@@ -63,3 +63,19 @@
     }
 
 }
+
+@media (max-width: 700px) {
+    // .char__info {
+    //     display: flex;
+    //     flex-wrap: wrap;
+    // }
+
+    .char__basics {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+.char__info {
+    grid-row: 1 / 2;
+    margin-bottom: 20px;
+}

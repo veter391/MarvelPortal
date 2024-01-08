@@ -11,93 +11,102 @@ class CharList extends Component {
         selected: 1
     }
 
-    // add service to variable and create instance of it
-    marvelService = new MarvelService();
+    marvelService = new MarvelService(); // add service to variable and create instance of it
 
-    // add components in the start
+    // #add components in the start
     componentDidMount() {
         // console.log('mount')
         this.onAddChars();
     }
 
-    // get new random char from server
-    newRandomChar = () => {
-        // generata random id
-        const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
+    // generate random id and check it if exists the same
+    onFilterSame = arr => {
+        const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000); // generata random id
+        if(arr.some(el => el.id === id)) {
+            this.onFilterSame(arr);
+        } 
 
-        // get element and change, filter it data
-        this.marvelService.getCharacter(id)
-            // filter element info 
-            .then(data => {this.onCharGenerate(data)})
-            // if server not found
-            // .catch(data => {console.log(`error ${data}`)})
+        return id;
+    }
+
+    // #get new random char from server
+    newRandomChar = () => {
+        
+        this.marvelService.getCharacter(this.onFilterSame(this.state.list)) // get element and change, filter it data
+            
+            .then(data => {this.onCharGenerate(data)}) // filter element info 
+            
+            // .catch(data => {console.log(`error ${data}`)}) // if server not found
             .catch(data => {
-                this.onCharGenerate({name: 'rey1', thumbnail: abyss, description: 'hello my friend'});
+                this.onCharGenerate({name: 'NoName', thumbnail: abyss, description: 'server not found'});
                 console.log(`Error Message: => ${data}`)
             })
     }
 
-    // create new filtered char and add it to array
+    // #create new filtered char and add it to array
     onCharGenerate = char => {
-        // filter char info
-        const charInfo = {
+        
+        const charInfo = { // filter char info
             name: char.name,
-            thumbnail: char.thumbnail
-        }
+            thumbnail: char.thumbnail,
+            id: char.id
+        } 
 
-        // change list and add obj(char) to it
-        this.setState(({list}) => {
+        
+        this.setState(({list}) => { // change list and add obj(char) to it
             return {
                 list: [...list, charInfo]
             }
         })
     }
 
-    // generate html list and pull info from state.list
-    onCreateList = list => {
-        // change array with chars and add to variable
-        const newList = list.map((item, i) => {
+    // #generate html list and pull info from state.list
+    renderItems = (arr) => {
+        
+        const newList = arr.map((item, i) => { // change array with chars and add to variable
 
-            // get info of item
-            const {name, thumbnail} = item;
+            const {name, thumbnail, id} = item; // get info of item
+            let imgStyle = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg" ? {objectFit: 'contain'} : null
+            
+            return ( // return custom html(xhtml) code to variable
+                
+                <li onClick={ // check selected item and add class for it
+    
+                    () => {this.props.onCharSelected(id); this.setState({selected: i})} /* check id and change state.selected adding current el */ } 
+                    key={id}
+                    className={`char__item ${i === this.state.selected ? 'char__item_selected' : ''}` /* check and add active class if index === selected */}>
 
-            // return custom html(xhtml) code to variable
-            return (
-                // check selected item and add class for it
-                <li className={`char__item ${i === this.state.selected ? 'char__item_selected' : ''}`}>
-                    <img src={thumbnail} alt={name ? name : 'No img'}/>
+                    <img src={thumbnail} alt={name ? name : 'No img'} style={imgStyle}/>
                     <div className="char__name">{name ? name : 'No name'}</div>
                 </li>
             );
         })
 
-        // return variable with created code
-        return newList;
+        return (
+            <ul className="char__grid">
+                {newList}
+            </ul>
+        ); // return variable with created code
     }
 
-    // number of items add to list
+    // #number of items add to list
     onAddChars = (num = 9) => {
         for (let i = 0; i < num; i++) {
             this.newRandomChar();            
         }
     }
 
-    // function for linking  the button and the number of added elements
-    onAddMore = () => {
-        this.onAddChars(3)
-    }
-
 
     render() {
         // console.log('render')
-        console.log(this.state.list)
 
         return (
             <div className="char__list">
-                <ul className="char__grid">
-                    {this.onCreateList(this.state.list)}
-                </ul>
-                <button className="button button__main button__long" onClick={this.onAddMore}>
+
+                {this.renderItems(this.state.list)}
+
+                <button className="button button__main button__long" 
+                        onClick={() => this.onAddChars(3)}>
                     <div className="inner">load more</div>
                 </button>
             </div>
@@ -107,11 +116,11 @@ class CharList extends Component {
 
 export default CharList;
 
+
+
+
 // Random Char:
 // 1. change the char info to click inner(try it) btn and (check how to work with error)
-// * 2. change style if image not found!
-// 4. check browser history!!!
 
 // CharList:
-// * 1. create CharList logic
-// 2. clear code and add coments
+// 3. delete random char and get chars in order or => filter list even when add new char and delet if char exists.
