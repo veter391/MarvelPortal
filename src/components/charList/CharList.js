@@ -67,15 +67,24 @@ class CharList extends Component {
 
             const {name, thumbnail, id} = item; // get info of item
             let imgStyle = thumbnail === "http://i.annihil.us/u/prod/marvel/i/mg/b/40/image_not_available.jpg" ? {objectFit: 'contain'} : null
+
+            const handleKeyPress = event => {
+                if (event.key === 'Enter' || event.key === 'Space') {
+                    this.props.onCharSelected(id);
+                }
+            }
             
             return ( // return custom html(xhtml) code to variable
                 
                 <li onClick={ // check selected item and add class for it
     
                     () => {this.props.onCharSelected(id); this.setState({selected: i})} /* check id and change state.selected adding current el */ } 
+                    onFocus={ () => { this.setState({ selected: i }) } } 
+                    onKeyDown={handleKeyPress}
                     key={id}
+                    tabIndex='0'
                     className={`char__item ${i === this.state.selected ? 'char__item_selected' : ''}` /* check and add active class if index === selected */}>
-
+                    
                     <img src={thumbnail} alt={name ? name : 'No img'} style={imgStyle}/>
                     <div className="char__name">{name ? name : 'No name'}</div>
                 </li>
