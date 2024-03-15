@@ -1,88 +1,52 @@
-import { Component } from 'react';
-import MarvelService from '../../services/MarvelService';
+import { useEffect, useState } from 'react';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
 import './charInfo.scss';
 
-class CharInfo extends Component {
+function CharInfo({ charId }) {
 
-    
-    state = {
-        // create object char because state can be other info, errors, spinner etc...
-        // create object char with info about character
-        char: null,
-        loading: false,
-        error: false
-    }
+    const [char, setChar] = useState(null);
 
-    marvelService = new MarvelService(); // add service to variable and create instance of it
+    const { loading, error, getCharacter, clearError } = useMarvelService(); // add service to variable and create instance of it
 
-    componentDidMount() {
-        this.updateChar();
-    }
+    useEffect(() => {
+        updateChar();
+    }, [charId]);
 
-    componentDidUpdate(prevProps, prevStates) {
-        if(this.props.charId !== prevProps.charId) {
-            this.updateChar();
-        }
-    }
+    const updateChar = () => {
+        if(!charId) return;
 
-    updateChar = () => {
-        const {charId} = this.props;
-        if(!charId) {
-            return;
-        }
-
-
-        // show the spinner
-        this.setState({loading : true});
-
-        this.marvelService
-            .getCharacter(charId)
-            .then(this.onCharLoaded)
-            .catch(this.onError);
+        // every request clear errors
+        clearError();
+        getCharacter(charId)
+            .then(onCharLoaded)
     }
 
     
     // change info when is loaded
-    onCharLoaded = char => this.setState({
+    const onCharLoaded = char => {
         // change state.char and add new obj
-        char, 
-        // change loading state when char is loaded
-        loading: false
-    });
+        setChar(char);
+    };
 
-    onError = () => {
-        this.setState({
-            // change loading state when char is loaded
-            loading: false,
-            error: true
-        })
-    }
+    const skeleton = char || loading || error ? null : <Skeleton/>,
+    // if exist error return error
+        errorMessage = error ? <ErrorMessage/> : null,
+    // if wait info from server return spinner
+        spinner = loading ? <Spinner/> : null,
+    // if doesn't exist error and spinner is null return content
+        content = !(loading || error || !char) ? <View char={char}/> : null
 
-    render() {
-
-        // get ellements from state
-        const {char, loading, error} = this.state,
-
-            skeleton = char || loading || error ? null : <Skeleton/>,
-        // if exist error return error
-            errorMessage = error ? <ErrorMessage/> : null,
-        // if wait info from server return spinner
-            spinner = loading ? <Spinner/> : null,
-        // if doesn't exist error and spinner is null return content
-            content = !(loading || error || !char) ? <View char={char}/> : null
-
-        return (
-            <div className="char__info">
-                {skeleton}
-                {errorMessage}
-                {spinner}
-                {content}
-            </div>
-        )
-    }
+    return (
+        <div className="char__info">
+            {skeleton}
+            {errorMessage}
+            {spinner}
+            {content}
+        </div>
+    )
 }
 
 // add other components, breake the html and divide to differens components

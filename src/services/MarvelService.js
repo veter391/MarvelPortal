@@ -1,40 +1,44 @@
+import { useHttp } from "../hooks/http.hook";
 
 
-class MarvelService {
+const useMarvelService = () => {
 
-    _apiBase = 'https://gateway.marvel.com:443/v1/public/'
+    const { loading, request, error, clearError } = useHttp()
+
+    const _apiBase = 'https://gateway.marvel.com:443/v1/public/'
     // personal api key
-    _apiKey = 'apikey=d0cba7230807643ac1c3837fafb40afd'
-
-    getrecorce = async url => {
-        let res = await fetch(url);
-
-        if (!res.ok) {
-            throw new Error(`Could not fetch ${url}, status: ${res.status}`)
-        }
-
-        // return promice
-        return await res.json();
-    }
+    const _apiKey = 'apikey=d0cba7230807643ac1c3837fafb40afd'
 
     // find all characters
-    getAllCharacters = async () => {
-        const res = await this.getrecorce(`${this._apiBase}characters?limit=9&offset=210&${this._apiKey}`);
+    const getAllCharacters = async (num, offset) => {
+        const res = await request(`${_apiBase}characters?limit=${num}&offset=${offset}&${_apiKey}`);
 
-        // map return callback function to each element is the same => ''.map(item => this._transformCharacter(item))''
-        return res.data.results.map(this._transformCharacter); 
+        // map return callback function to each element is the same => ''.map(item => _transformCharacter(item))''
+        return res.data.results.map(_transformCharacter); 
     }
 
     // return character with uniq id
-    getCharacter = async id => {
-        const res = await this.getrecorce(`${this._apiBase}characters/${id}?${this._apiKey}`);
+    const getCharacter = async id => {
+        const res = await request(`${_apiBase}characters/${id}?${_apiKey}`);
 
         // return transformed element
-        return this._transformCharacter(res.data.results[0]);
+        return _transformCharacter(res.data.results[0]);
     }
 
+    const getAllComics = async (offset = 0) => {
+        const res = await request(
+            `${_apiBase}comics?orderBy=issueNumber&limit=8&offset=${offset}&${_apiKey}`
+        );
+        return res.data.results.map(_transformComics);
+    };
+
+    const getComic = async (id) => {
+        const res = await request(`${_apiBase}comics/${id}?${_apiKey}`);
+        return _transformComics(res.data.results[0]);
+    };
+
     // if function or variable starts with '_' be careful with changes!! try to NOT CHANGE IT
-    _transformCharacter = (char) => {
+    const _transformCharacter = (char) => {
         // transform and return new object and add this to state(obj)
         return {
             id: char.id,
@@ -47,7 +51,26 @@ class MarvelService {
         }
     }
 
+    const _transformComics = (comics) => {
+        return {
+            id: comics.id,
+            title: comics.title,
+            description: comics.description || "There is no description",
+            pageCount: comics.pageCount
+                ? `${comics.pageCount} p.`
+                : "No information about the number of pages",
+            thumbnail: comics.thumbnail.path + "." + comics.thumbnail.extension,
+            language: comics.textObjects[0]?.language || "en-us",
+            price: comics.prices[0].price
+                ? `${comics.prices[0].price}$`
+                : "not available",
+        };
+    };
+
+    // return usable service variables
+    return { loading, error, getAllCharacters, getCharacter, clearError, getAllComics, getComic }
+
 }
 
 
-export default MarvelService;
+export default useMarvelService;

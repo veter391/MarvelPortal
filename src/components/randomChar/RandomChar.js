@@ -1,119 +1,71 @@
-import { Component } from 'react';
-import MarvelService from '../../services/MarvelService';
+import { useEffect, useState } from 'react';
+import useMarvelService from '../../services/MarvelService';
 import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage'
 
 import './randomChar.scss';
 import mjolnir from '../../resources/img/mjolnir.png';
 
-class RandomChar extends Component{
+function RandomChar() {
 
-    constructor(props) {
-        super(props);
-        // this.updateChar(); // is bad desition! is owerflows the memory!! you can use the react huks!
-        // console.log('constructor')
-    }
-
-    // basik huks
-    // componentDidMount() => run once after the rendering
-    // componentDidUpdate() => update component
-    // componentWillUnmount() => if component dead clear all nodes, timouts, etc.. from componentDidMount()
-    // componentDidCatch() => if error
-
-    componentDidMount() {
+    useEffect(() => {
         // console.log('mount');
-        this.updateChar();
-    }
+        updateChar();
+    }, []);
 
-    state = {
-        // create object char because state can be other info, errors, spinner etc...
-        // create object char with info about character
-        char: {},
-        loading: true,
-        error: false
-    }
+    const [char, setChar] = useState({});
 
     // if want to work with a class you need to create an instance of it!!! 
-    marvelService = new MarvelService();
+    const {loading, error, getCharacter, clearError} = useMarvelService();
 
     // change info when is loaded
-    onCharLoaded = char => this.setState({
+    const onCharLoaded = char => {
         // change state.char and add new obj
-        char, 
-        // change loading state when char is loaded
-        loading: false
-    });
+        setChar(char);
+    };
 
-    onError = () => {
-        this.setState({
-            // change loading state when char is loaded
-            loading: false,
-            error: true
-        })
-    }
-
-    updateChar = () => {
+    const updateChar = () => {
+        // every request clear errors
+        clearError();
         // generate random id for a char
         const id = Math.floor(Math.random() * (1011400 - 1011000) + 1011000);
 
-        // loading true
-        this.setState({loading : true});
-
         // get character info and change the state
-        this.marvelService
-            .getCharacter(id)
-            /* 
-            .then(this.onCharLoaded) is the same .then(res => this.setState(res))
-            if you call a function this function works with all elements in turn
-            */
-           
-            
+        getCharacter(id)
             // if info is loadded correctly
-            .then(this.onCharLoaded)
-            // if server return error
-            .catch(this.onError);
+            .then(onCharLoaded)
+            // ! all errors is checked inside service hook!
+            // .catch(onError);
     }
 
-    render() {
-        // console.log('render');
-        /* 
-        destructuritzation of object char inside state.
-        const {char: {name, description, thumbnail, homepage, wiki}, loading} = this.state;
-        */
+    const
+    // if exist error return error
+        errorMessage = error ? <ErrorMessage/> : null,
+    // if wait info from server return spinner
+        spinner = loading ? <Spinner/> : null,
+    // if doesn't exist error and spinner is null return content
+        content = !(loading || error) ? <View char={char}/> : null
 
-
-        // get ellements from state
-        const {char, loading, error} = this.state,
-        // if exist error return error
-            errorMessage = error ? <ErrorMessage/> : null,
-        // if wait info from server return spinner
-            spinner = loading ? <Spinner/> : null,
-        // if doesn't exist error and spinner is null return content
-            content = !(loading || error) ? <View char={char}/> : null
-
-        return (
-            <div className="randomchar">
-                {/* if loading true return animated spinner */}
-                {/* {loading ? <Spinner/> : <View char={char}/>} */}
-                { errorMessage }
-                { spinner }
-                { content }
-                <div className="randomchar__static">
-                    <p className="randomchar__title">
-                        Random character for today!<br/>
-                        Do you want to get to know him better?
-                    </p>
-                    <p className="randomchar__title">
-                        Or choose another one
-                    </p>
-                    <button className="button button__main">
-                        <div className="inner" onClick={this.updateChar}>try it</div>
-                    </button>
-                    <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
-                </div>
+    return (
+        <div className="randomchar">
+            { errorMessage }
+            { spinner }
+            { content }
+            <div className="randomchar__static">
+                <p className="randomchar__title">
+                    Random character for today!<br/>
+                    Do you want to get to know him better?
+                </p>
+                <p className="randomchar__title">
+                    Or choose another one
+                </p>
+                <button className="button button__main">
+                    <div className="inner" onClick={updateChar}>try it</div>
+                </button>
+                <img src={mjolnir} alt="mjolnir" className="randomchar__decoration"/>
             </div>
-        )
-    }
+        </div>
+    )
 }
 
 // create new componet with dinamic block, check it and generate spinner or info
