@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import useMarvelService from '../../services/MarvelService';
 
 import './charList.scss';
-import abyss from '../../resources/img/abyss.jpg';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Spinner from '../spinner/Spinner';
 

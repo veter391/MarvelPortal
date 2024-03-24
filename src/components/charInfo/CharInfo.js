@@ -4,6 +4,7 @@ import Spinner from '../spinner/Spinner';
 import ErrorMessage from '../errorMessage/ErrorMessage';
 import Skeleton from '../skeleton/Skeleton';
 import './charInfo.scss';
+import SearchCharForm from '../searchCharForm/SearchCharForm';
 
 function CharInfo({ charId }) {
 
@@ -40,11 +41,15 @@ function CharInfo({ charId }) {
         content = !(loading || error || !char) ? <View char={char}/> : null
 
     return (
-        <div className="char__info">
-            {skeleton}
-            {errorMessage}
-            {spinner}
-            {content}
+        <div>
+            <div className="char__info">
+                {skeleton}
+                {errorMessage}
+                {spinner}
+                {content}
+            </div>
+            
+            <SearchCharForm />
         </div>
     )
 }

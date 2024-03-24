@@ -18,3 +18,29 @@
         }
     }
 }
+
+@media (max-width: 800px) {
+    .app {
+        &__banner {
+            height: auto;
+            padding: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            align-items: center;
+            justify-content: center;
+            grid-gap: 15px;
+
+            &-text {
+                text-align: center;
+                font-size: 18px;
+                line-height: 26px;
+                padding-left: 0px;
+                padding-top: 0px;
+            }
+
+            img {
+                margin: auto;
+                max-width: 120px;
+            }
+        }
+    }
+}

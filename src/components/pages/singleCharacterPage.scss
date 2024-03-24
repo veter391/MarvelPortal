@@ -1,0 +1,45 @@
+@import '../../style/variables';
+
+.single-comic {
+    display: flex;
+    column-gap: 30px;
+
+    &__char-img {
+        width: 250px;
+        height: 250px;
+        object-fit: cover;
+        margin-right: 25px;
+    }
+
+    &__info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__descr {
+        margin-bottom: 25px;
+    }
+
+    .single-comic__back {
+        width: fit-content;
+    }
+}
+
+@media (max-width: 600px) {
+    .single-comic {
+        flex-direction: column;
+
+        &__char-img,
+        &__img {
+            width: 200px;
+            height: 200px;
+            margin-right: 0;
+            margin: 0 auto;
+            margin-bottom: 20px;
+        }
+
+        &__img {
+            height: 300px;
+        }
+    }
+}
